@@ -31,7 +31,7 @@ function Register() {
       return Object.fromEntries((data ?? []).map((r) => [r.key, r.value]));
     },
   });
-  const fee = Number(cfg?.vendor_fee ?? 0);
+  const fee = Number(cfg?.["vendor_fee"] ?? 0);
 
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -67,10 +67,10 @@ function Register() {
           <>
             <h1 className="font-display text-3xl font-semibold">Sell your products on UTL</h1>
             <p className="mt-2 text-muted-foreground">Register your company. Registration fee: <b className="text-foreground">{formatPKR(fee)}</b></p>
-            {cfg?.vendor_payment_info && (
+            {cfg?.["vendor_payment_info"] && (
               <div className="mt-4 rounded-xl border border-accent bg-accent/10 p-4 text-sm">
                 <p className="font-semibold">How to pay</p>
-                <p className="whitespace-pre-line">{cfg.vendor_payment_info}</p>
+                <p className="whitespace-pre-line">{cfg["vendor_payment_info"]}</p>
               </div>
             )}
             <form onSubmit={submit} className="mt-6 space-y-3">

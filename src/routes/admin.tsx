@@ -363,7 +363,7 @@ function Companies() {
   });
   const [fee, setFee] = useState("");
   const [info, setInfo] = useState("");
-  useEffect(() => { if (cfg) { setFee(cfg.vendor_fee ?? ""); setInfo(cfg.vendor_payment_info ?? ""); } }, [cfg]);
+  useEffect(() => { if (cfg) { setFee(cfg["vendor_fee"] ?? ""); setInfo(cfg["vendor_payment_info"] ?? ""); } }, [cfg]);
   const save = async () => {
     const { error } = await supabase.from("store_settings").upsert([{ key: "vendor_fee", value: fee }, { key: "vendor_payment_info", value: info }]);
     if (error) toast.error(error.message); else { toast.success("Saved"); qc.invalidateQueries({ queryKey: ["vendor-cfg"] }); }
