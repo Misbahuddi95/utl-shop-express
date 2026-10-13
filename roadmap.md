@@ -6,3 +6,4 @@
 - [x] Sample products with photos and descriptions; test order verified end-to-end
 - [x] Realtime order updates in admin Orders tab
 - [ ] SMS order alerts to admin — blocked: needs Twilio connection (user declined) + admin phone number
+- [ ] Auto email to customer when order is completed — blocked: needs email domain setup
