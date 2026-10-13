@@ -148,6 +148,51 @@ export type Database = {
         }
         Relationships: []
       }
+      vendor_registrations: {
+        Row: {
+          city: string | null
+          company_name: string
+          contact_name: string
+          created_at: string
+          email: string
+          fee_amount: number
+          id: string
+          payment_method: string
+          payment_reference: string
+          phone: string
+          products_info: string | null
+          status: string
+        }
+        Insert: {
+          city?: string | null
+          company_name: string
+          contact_name: string
+          created_at?: string
+          email: string
+          fee_amount?: number
+          id?: string
+          payment_method: string
+          payment_reference: string
+          phone: string
+          products_info?: string | null
+          status?: string
+        }
+        Update: {
+          city?: string | null
+          company_name?: string
+          contact_name?: string
+          created_at?: string
+          email?: string
+          fee_amount?: number
+          id?: string
+          payment_method?: string
+          payment_reference?: string
+          phone?: string
+          products_info?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
