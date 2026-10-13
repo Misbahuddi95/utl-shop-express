@@ -7,3 +7,6 @@
 - [x] Realtime order updates in admin Orders tab
 - [ ] SMS order alerts to admin — blocked: needs Twilio connection (user declined) + admin phone number
 - [ ] Auto email to customer when order is completed — blocked: needs email domain setup
+- [x] Bulk add real UTL products with photos + AI descriptions
+- [x] Admin products list page (Products tab)
+- [ ] Online payment link on orders — blocked: needs paid plan or user's own payment account
