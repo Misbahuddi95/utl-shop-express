@@ -377,9 +377,11 @@ function Companies() {
   return (
     <div className="space-y-6">
       <div className="rounded-xl border bg-card p-4 text-sm space-y-2">
-        <h3 className="font-semibold">Registration fee settings</h3>
+        <h3 className="font-semibold">Registration fee & payment settings</h3>
         <label className="block">Fee (PKR)<input value={fee} onChange={(e) => setFee(e.target.value)} type="number" min="0" className="mt-1 w-full rounded-lg border bg-background px-3 py-2" /></label>
-        <label className="block">Payment instructions (account number etc.)<textarea value={info} onChange={(e) => setInfo(e.target.value)} rows={2} className="mt-1 w-full rounded-lg border bg-background px-3 py-2" /></label>
+        <label className="block">Bank account details (bank name, account title, IBAN / account no.)<textarea value={bank} onChange={(e) => setBank(e.target.value)} rows={3} className="mt-1 w-full rounded-lg border bg-background px-3 py-2" /></label>
+        <label className="block">JazzCash / Easypaisa details (account name, mobile number)<textarea value={mobile} onChange={(e) => setMobile(e.target.value)} rows={3} className="mt-1 w-full rounded-lg border bg-background px-3 py-2" /></label>
+        <label className="block">Extra payment instructions (optional)<textarea value={info} onChange={(e) => setInfo(e.target.value)} rows={2} className="mt-1 w-full rounded-lg border bg-background px-3 py-2" /></label>
         <div className="flex items-center justify-between">
           <button onClick={save} className={btn}>Save</button>
           <Link to="/register" className="underline">Open registration page</Link>
