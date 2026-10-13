@@ -61,3 +61,16 @@ export function ordersToCsv(rows: { created_at: string; customer_name: string; p
   });
   return [head.map(esc).join(","), ...lines].join("\n");
 }
+
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+
+/** Store logo URL from store_settings (empty string until loaded / not set). */
+export function useStoreLogo() {
+  const { data = "" } = useQuery({
+    queryKey: ["store-logo"],
+    queryFn: async () =>
+      (await supabase.from("store_settings").select("value").eq("key", "logo_url").maybeSingle()).data?.value ?? "",
+  });
+  return data;
+}
