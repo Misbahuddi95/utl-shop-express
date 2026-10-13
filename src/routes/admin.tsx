@@ -357,15 +357,20 @@ function Companies() {
   const { data: cfg } = useQuery({
     queryKey: ["vendor-cfg"],
     queryFn: async () => {
-      const { data } = await supabase.from("store_settings").select("key,value").in("key", ["vendor_fee", "vendor_payment_info"]);
+      const { data } = await supabase.from("store_settings").select("key,value").in("key", ["vendor_fee", "vendor_payment_info", "vendor_bank_details", "vendor_mobile_details"]);
       return Object.fromEntries((data ?? []).map((r) => [r.key, r.value]));
     },
   });
   const [fee, setFee] = useState("");
   const [info, setInfo] = useState("");
-  useEffect(() => { if (cfg) { setFee(cfg["vendor_fee"] ?? ""); setInfo(cfg["vendor_payment_info"] ?? ""); } }, [cfg]);
+  const [bank, setBank] = useState("");
+  const [mobile, setMobile] = useState("");
+  useEffect(() => { if (cfg) { setFee(cfg["vendor_fee"] ?? ""); setInfo(cfg["vendor_payment_info"] ?? ""); setBank(cfg["vendor_bank_details"] ?? ""); setMobile(cfg["vendor_mobile_details"] ?? ""); } }, [cfg]);
   const save = async () => {
-    const { error } = await supabase.from("store_settings").upsert([{ key: "vendor_fee", value: fee }, { key: "vendor_payment_info", value: info }]);
+    const { error } = await supabase.from("store_settings").upsert([
+      { key: "vendor_fee", value: fee }, { key: "vendor_payment_info", value: info },
+      { key: "vendor_bank_details", value: bank }, { key: "vendor_mobile_details", value: mobile },
+    ]);
     if (error) toast.error(error.message); else { toast.success("Saved"); qc.invalidateQueries({ queryKey: ["vendor-cfg"] }); }
   };
   const paidTotal = data.filter((v) => v.status !== "pending" && v.status !== "rejected").reduce((s, v) => s + Number(v.fee_amount), 0);
