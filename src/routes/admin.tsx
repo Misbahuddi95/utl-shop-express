@@ -84,7 +84,7 @@ function Login() {
 }
 
 function Dashboard({ email }: { email: string }) {
-  const [tab, setTab] = useState<"orders" | "products" | "categories">("orders");
+  const [tab, setTab] = useState<"orders" | "products" | "categories" | "settings">("orders");
   return (
     <div className="min-h-screen">
       <header className="border-b bg-primary text-primary-foreground">
@@ -99,11 +99,11 @@ function Dashboard({ email }: { email: string }) {
       </header>
       <div className="mx-auto max-w-5xl px-4 py-6">
         <div className="mb-6 flex gap-2">
-          {(["orders", "products", "categories"] as const).map((t) => (
+          {(["orders", "products", "categories", "settings"] as const).map((t) => (
             <button key={t} onClick={() => setTab(t)} className={`rounded-full border px-4 py-1.5 text-sm capitalize ${tab === t ? "bg-primary text-primary-foreground" : "bg-card"}`}>{t}</button>
           ))}
         </div>
-        {tab === "orders" ? <Orders /> : tab === "products" ? <Products /> : <Categories />}
+        {tab === "orders" ? <Orders /> : tab === "products" ? <Products /> : tab === "categories" ? <Categories /> : <Settings />}
       </div>
     </div>
   );
