@@ -27,7 +27,7 @@ function Register() {
   const { data: cfg } = useQuery({
     queryKey: ["vendor-cfg"],
     queryFn: async () => {
-      const { data } = await supabase.from("store_settings").select("key,value").in("key", ["vendor_fee", "vendor_payment_info"]);
+      const { data } = await supabase.from("store_settings").select("key,value").in("key", ["vendor_fee", "vendor_payment_info", "vendor_bank_details", "vendor_mobile_details"]);
       return Object.fromEntries((data ?? []).map((r) => [r.key, r.value]));
     },
   });
@@ -67,10 +67,23 @@ function Register() {
           <>
             <h1 className="font-display text-3xl font-semibold">Sell your products on UTL</h1>
             <p className="mt-2 text-muted-foreground">Register your company. Registration fee: <b className="text-foreground">{formatPKR(fee)}</b></p>
-            {cfg?.["vendor_payment_info"] && (
-              <div className="mt-4 rounded-xl border border-accent bg-accent/10 p-4 text-sm">
+            {(cfg?.["vendor_bank_details"] || cfg?.["vendor_mobile_details"] || cfg?.["vendor_payment_info"]) && (
+              <div className="mt-4 space-y-3 rounded-xl border border-accent bg-accent/10 p-4 text-sm">
                 <p className="font-semibold">How to pay</p>
-                <p className="whitespace-pre-line">{cfg["vendor_payment_info"]}</p>
+                {cfg?.["vendor_bank_details"] && (
+                  <div>
+                    <p className="font-medium">Bank transfer</p>
+                    <p className="whitespace-pre-line text-muted-foreground">{cfg["vendor_bank_details"]}</p>
+                  </div>
+                )}
+                {cfg?.["vendor_mobile_details"] && (
+                  <div>
+                    <p className="font-medium">JazzCash / Easypaisa</p>
+                    <p className="whitespace-pre-line text-muted-foreground">{cfg["vendor_mobile_details"]}</p>
+                  </div>
+                )}
+                {cfg?.["vendor_payment_info"] && <p className="whitespace-pre-line text-muted-foreground">{cfg["vendor_payment_info"]}</p>}
+                <p className="text-muted-foreground">Pay the fee using any method above, then enter your transaction ID in the form below.</p>
               </div>
             )}
             <form onSubmit={submit} className="mt-6 space-y-3">

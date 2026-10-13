@@ -357,24 +357,31 @@ function Companies() {
   const { data: cfg } = useQuery({
     queryKey: ["vendor-cfg"],
     queryFn: async () => {
-      const { data } = await supabase.from("store_settings").select("key,value").in("key", ["vendor_fee", "vendor_payment_info"]);
+      const { data } = await supabase.from("store_settings").select("key,value").in("key", ["vendor_fee", "vendor_payment_info", "vendor_bank_details", "vendor_mobile_details"]);
       return Object.fromEntries((data ?? []).map((r) => [r.key, r.value]));
     },
   });
   const [fee, setFee] = useState("");
   const [info, setInfo] = useState("");
-  useEffect(() => { if (cfg) { setFee(cfg["vendor_fee"] ?? ""); setInfo(cfg["vendor_payment_info"] ?? ""); } }, [cfg]);
+  const [bank, setBank] = useState("");
+  const [mobile, setMobile] = useState("");
+  useEffect(() => { if (cfg) { setFee(cfg["vendor_fee"] ?? ""); setInfo(cfg["vendor_payment_info"] ?? ""); setBank(cfg["vendor_bank_details"] ?? ""); setMobile(cfg["vendor_mobile_details"] ?? ""); } }, [cfg]);
   const save = async () => {
-    const { error } = await supabase.from("store_settings").upsert([{ key: "vendor_fee", value: fee }, { key: "vendor_payment_info", value: info }]);
+    const { error } = await supabase.from("store_settings").upsert([
+      { key: "vendor_fee", value: fee }, { key: "vendor_payment_info", value: info },
+      { key: "vendor_bank_details", value: bank }, { key: "vendor_mobile_details", value: mobile },
+    ]);
     if (error) toast.error(error.message); else { toast.success("Saved"); qc.invalidateQueries({ queryKey: ["vendor-cfg"] }); }
   };
   const paidTotal = data.filter((v) => v.status !== "pending" && v.status !== "rejected").reduce((s, v) => s + Number(v.fee_amount), 0);
   return (
     <div className="space-y-6">
       <div className="rounded-xl border bg-card p-4 text-sm space-y-2">
-        <h3 className="font-semibold">Registration fee settings</h3>
+        <h3 className="font-semibold">Registration fee & payment settings</h3>
         <label className="block">Fee (PKR)<input value={fee} onChange={(e) => setFee(e.target.value)} type="number" min="0" className="mt-1 w-full rounded-lg border bg-background px-3 py-2" /></label>
-        <label className="block">Payment instructions (account number etc.)<textarea value={info} onChange={(e) => setInfo(e.target.value)} rows={2} className="mt-1 w-full rounded-lg border bg-background px-3 py-2" /></label>
+        <label className="block">Bank account details (bank name, account title, IBAN / account no.)<textarea value={bank} onChange={(e) => setBank(e.target.value)} rows={3} className="mt-1 w-full rounded-lg border bg-background px-3 py-2" /></label>
+        <label className="block">JazzCash / Easypaisa details (account name, mobile number)<textarea value={mobile} onChange={(e) => setMobile(e.target.value)} rows={3} className="mt-1 w-full rounded-lg border bg-background px-3 py-2" /></label>
+        <label className="block">Extra payment instructions (optional)<textarea value={info} onChange={(e) => setInfo(e.target.value)} rows={2} className="mt-1 w-full rounded-lg border bg-background px-3 py-2" /></label>
         <div className="flex items-center justify-between">
           <button onClick={save} className={btn}>Save</button>
           <Link to="/register" className="underline">Open registration page</Link>
