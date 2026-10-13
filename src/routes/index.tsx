@@ -51,7 +51,7 @@ function Store() {
       total: cartTotal(cart.items),
     });
     setSending(false);
-    if (error) return toast.error("Order could not be placed. Please check your details.");
+    if (error) { toast.error("Order could not be placed. Please check your details."); return; }
     cart.clear();
     setStep("done");
   }

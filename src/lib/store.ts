@@ -50,12 +50,12 @@ export function resizeImage(file: File, max = 700): Promise<string> {
   });
 }
 
-export function ordersToCsv(rows: { [k: string]: unknown }[]) {
+export function ordersToCsv(rows: { created_at: string; customer_name: string; phone: string; address: string; items: unknown; total: number; status: string; notes: string | null }[]) {
   const head = ["Date", "Customer", "Phone", "Address", "Items", "Total", "Status", "Notes"];
   const esc = (v: unknown) => `"${String(v ?? "").replace(/"/g, '""')}"`;
   const lines = rows.map((o) => {
-    const items = (o.items as CartItem[]).map((i) => `${i.name} x${i.qty}`).join("; ");
-    return [new Date(o.created_at as string).toLocaleString(), o.customer_name, o.phone, o.address, items, o.total, o.status, o.notes]
+    const items = (o.items as unknown as CartItem[]).map((i) => `${i.name} x${i.qty}`).join("; ");
+    return [new Date(o.created_at).toLocaleString(), o.customer_name, o.phone, o.address, items, o.total, o.status, o.notes]
       .map(esc)
       .join(",");
   });

@@ -35,7 +35,7 @@ function Admin() {
     return () => data.subscription.unsubscribe();
   }, []);
   useEffect(() => {
-    if (!session) return setIsAdmin(null);
+    if (!session) { setIsAdmin(null); return; }
     supabase.from("user_roles").select("role").eq("user_id", session.user.id).eq("role", "admin")
       .then(({ data }) => setIsAdmin(!!data?.length));
   }, [session]);
@@ -61,7 +61,7 @@ function Login() {
       ? await supabase.auth.signInWithPassword({ email, password })
       : await supabase.auth.signUp({ email, password, options: { emailRedirectTo: window.location.origin + "/admin" } });
     setBusy(false);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     if (mode === "up") toast.success("Check your email to confirm your account, then sign in.");
   }
   return (
@@ -211,10 +211,10 @@ function Products() {
 
   async function save(e: React.FormEvent) {
     e.preventDefault();
-    if (!editing) return;
+    if (!editing) return undefined;
     const { id, ...row } = editing;
     const { error } = id ? await supabase.from("products").update(row).eq("id", id) : await supabase.from("products").insert(row);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success("Saved");
     setEditing(null);
     refresh();
