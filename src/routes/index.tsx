@@ -4,7 +4,7 @@ import { useState } from "react";
 import { ShoppingBag, X, Minus, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { cartTotal, formatPKR, useCart } from "@/lib/store";
+import { cartTotal, formatPKR, useCart, useStoreLogo } from "@/lib/store";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -22,6 +22,7 @@ export const Route = createFileRoute("/")({
 
 function Store() {
   const cart = useCart();
+  const logo = useStoreLogo();
   const [cat, setCat] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState<"cart" | "checkout" | "done">("cart");
