@@ -46,6 +46,7 @@ function Store() {
     const { error } = await supabase.from("orders").insert({
       customer_name: String(f.get("name")).trim(),
       phone: String(f.get("phone")).trim(),
+      customer_email: String(f.get("email")).trim().toLowerCase(),
       address: String(f.get("address")).trim(),
       notes: String(f.get("notes") || "").trim() || null,
       items: cart.items,
@@ -141,6 +142,7 @@ function Store() {
               <form onSubmit={placeOrder} className="flex flex-1 flex-col gap-3 overflow-y-auto p-4">
                 <input name="name" required maxLength={200} placeholder="Full name" className="rounded-lg border bg-card px-3 py-2" />
                 <input name="phone" required minLength={5} maxLength={30} placeholder="Phone number" className="rounded-lg border bg-card px-3 py-2" />
+                <input name="email" type="email" required maxLength={255} placeholder="Email (for order updates)" className="rounded-lg border bg-card px-3 py-2" />
                 <textarea name="address" required minLength={3} maxLength={1000} placeholder="Delivery address" rows={3} className="rounded-lg border bg-card px-3 py-2" />
                 <textarea name="notes" maxLength={1000} placeholder="Notes (optional)" rows={2} className="rounded-lg border bg-card px-3 py-2" />
                 <p className="text-sm">Total: <b>{formatPKR(cartTotal(cart.items))}</b> · Cash on delivery</p>
