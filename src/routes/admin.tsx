@@ -281,24 +281,67 @@ function Products() {
     </form>
   );
 
+  return <ProductList data={data} cats={cats} onEdit={(p) => setEditing({ ...p, price: Number(p.price) })} onNew={() => setEditing({ name: "", description: "", price: 0, image_url: null, category_id: cats[0]?.id ?? null, in_stock: true })} refresh={refresh} />;
+}
+
+function ProductList({ data, cats, onEdit, onNew, refresh }: {
+  data: Array<{ id: string; name: string; price: number | string; image_url: string | null; category_id: string | null; in_stock: boolean; description: string | null }>;
+  cats: Array<{ id: string; name: string }>;
+  onEdit: (p: Product & { id: string }) => void;
+  onNew: () => void;
+  refresh: () => void;
+}) {
+  const [filter, setFilter] = useState<string>("all");
+  const [q, setQ] = useState("");
+  const catName = (id: string | null) => cats.find((c) => c.id === id)?.name ?? "Uncategorised";
+
+  const visible = data.filter((p) => {
+    if (filter !== "all" && p.category_id !== filter) return false;
+    if (q && !p.name.toLowerCase().includes(q.toLowerCase())) return false;
+    return true;
+  });
+
+  // Group by category for a category-wise view
+  const groups = new Map<string, typeof visible>();
+  for (const p of visible) {
+    const key = catName(p.category_id);
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key)!.push(p);
+  }
+
   return (
     <div>
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-xl font-semibold">Products ({data.length})</h2>
-        <button className={btn} onClick={() => setEditing({ name: "", description: "", price: 0, image_url: null, category_id: cats[0]?.id ?? null, in_stock: true })}>Add product</button>
+        <button className={btn} onClick={onNew}>Add product</button>
       </div>
-      <div className="space-y-2">
-        {data.map((p) => (
-          <div key={p.id} className="flex items-center gap-3 rounded-xl border bg-card p-2 text-sm">
-            <div className="h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-muted">{p.image_url && <img src={p.image_url} alt="" className="h-full w-full object-cover" />}</div>
-            <div className="flex-1"><p className="font-medium">{p.name}</p><p className="text-xs text-muted-foreground">{formatPKR(Number(p.price))}{!p.in_stock && " · sold out"}</p></div>
-            <button className="underline" onClick={() => setEditing({ ...p, price: Number(p.price) })}>Edit</button>
-            <button className="text-destructive underline" onClick={async () => {
-              if (confirm("Delete this product?")) { await supabase.from("products").delete().eq("id", p.id); refresh(); }
-            }}>Delete</button>
+      <input placeholder="Search products…" value={q} onChange={(e) => setQ(e.target.value)} className={input + " mb-3"} />
+      <div className="mb-4 flex flex-wrap gap-2">
+        <button onClick={() => setFilter("all")} className={`rounded-full border px-3 py-1 text-xs ${filter === "all" ? "bg-primary text-primary-foreground" : "bg-card"}`}>All ({data.length})</button>
+        {cats.map((c) => {
+          const n = data.filter((p) => p.category_id === c.id).length;
+          if (!n) return null;
+          return <button key={c.id} onClick={() => setFilter(c.id)} className={`rounded-full border px-3 py-1 text-xs ${filter === c.id ? "bg-primary text-primary-foreground" : "bg-card"}`}>{c.name} ({n})</button>;
+        })}
+      </div>
+      {[...groups.entries()].map(([cat, items]) => (
+        <div key={cat} className="mb-6">
+          <h3 className="mb-2 text-sm font-semibold uppercase tracking-wide text-muted-foreground">{cat} ({items.length})</h3>
+          <div className="space-y-2">
+            {items.map((p) => (
+              <div key={p.id} className="flex items-center gap-3 rounded-xl border bg-card p-2 text-sm">
+                <div className="h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-muted">{p.image_url && <img src={p.image_url} alt="" className="h-full w-full object-cover" />}</div>
+                <div className="flex-1"><p className="font-medium">{p.name}</p><p className="text-xs text-muted-foreground">{formatPKR(Number(p.price))}{!p.in_stock && " · sold out"}</p></div>
+                <button className="underline" onClick={() => onEdit(p as Product & { id: string })}>Edit</button>
+                <button className="text-destructive underline" onClick={async () => {
+                  if (confirm("Delete this product?")) { await supabase.from("products").delete().eq("id", p.id); refresh(); }
+                }}>Delete</button>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
+        </div>
+      ))}
+      {!visible.length && <p className="text-muted-foreground">No products match this filter.</p>}
     </div>
   );
 }
