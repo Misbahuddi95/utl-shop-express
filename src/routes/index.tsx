@@ -4,7 +4,7 @@ import { useState } from "react";
 import { ShoppingBag, X, Minus, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { cartTotal, formatPKR, useCart } from "@/lib/store";
+import { cartTotal, formatPKR, useCart, useStoreLogo } from "@/lib/store";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -22,6 +22,7 @@ export const Route = createFileRoute("/")({
 
 function Store() {
   const cart = useCart();
+  const logo = useStoreLogo();
   const [cat, setCat] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState<"cart" | "checkout" | "done">("cart");
@@ -61,7 +62,11 @@ function Store() {
       <header className="sticky top-0 z-20 border-b bg-background/90 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
           <div className="flex items-center gap-2">
-            <span className="grid h-9 w-9 place-items-center rounded-full bg-primary font-display text-sm font-bold text-primary-foreground">UTL</span>
+            {logo ? (
+              <img src={logo} alt="UTL logo" className="h-9 w-9 rounded-full object-contain" />
+            ) : (
+              <span className="grid h-9 w-9 place-items-center rounded-full bg-primary font-display text-sm font-bold text-primary-foreground">UTL</span>
+            )}
             <span className="font-display text-xl font-semibold">UTL Store</span>
           </div>
           <button onClick={() => { setOpen(true); setStep("cart"); }} className="relative rounded-full bg-primary p-2.5 text-primary-foreground" aria-label="Cart">
