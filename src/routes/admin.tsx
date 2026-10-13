@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";
 import { Sparkles } from "lucide-react";
 import { generateDescription } from "@/lib/ai.functions";
-import { formatPKR, ordersToCsv, resizeImage, type CartItem } from "@/lib/store";
+import { formatPKR, ordersToCsv, resizeImage, useStoreLogo, type CartItem } from "@/lib/store";
 
 export const Route = createFileRoute("/admin")({
   ssr: false,
@@ -287,6 +287,48 @@ function Products() {
           </div>
         ))}
       </div>
+    </div>
+  );
+}
+
+function Settings() {
+  const qc = useQueryClient();
+  const logo = useStoreLogo();
+  const [busy, setBusy] = useState(false);
+
+  async function upload(e: React.ChangeEvent<HTMLInputElement>) {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    setBusy(true);
+    const dataUrl = await resizeImage(f, 256);
+    const { error } = await supabase.from("store_settings").upsert({ key: "logo_url", value: dataUrl });
+    setBusy(false);
+    if (error) { toast.error(error.message); return; }
+    toast.success("Logo updated");
+    qc.invalidateQueries({ queryKey: ["store-logo"] });
+  }
+
+  async function removeLogo() {
+    const { error } = await supabase.from("store_settings").upsert({ key: "logo_url", value: "" });
+    if (error) { toast.error(error.message); return; }
+    toast.success("Logo removed");
+    qc.invalidateQueries({ queryKey: ["store-logo"] });
+  }
+
+  return (
+    <div className="max-w-md space-y-4">
+      <h2 className="text-xl font-semibold">Store logo</h2>
+      <p className="text-sm text-muted-foreground">This logo shows at the top of the storefront. A square image works best.</p>
+      <div className="flex items-center gap-4 rounded-xl border bg-card p-4">
+        <div className="grid h-20 w-20 shrink-0 place-items-center overflow-hidden rounded-full bg-muted">
+          {logo ? <img src={logo} alt="Store logo" className="h-full w-full object-contain" /> : <span className="text-xs text-muted-foreground">No logo</span>}
+        </div>
+        <div className="space-y-2">
+          <input type="file" accept="image/*" disabled={busy} className="text-sm" onChange={upload} />
+          {logo && <button onClick={removeLogo} className="text-sm text-destructive underline">Remove logo</button>}
+        </div>
+      </div>
+      {busy && <p className="text-sm text-muted-foreground">Uploading…</p>}
     </div>
   );
 }
