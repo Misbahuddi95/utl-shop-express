@@ -84,7 +84,7 @@ function Login() {
 }
 
 function Dashboard({ email }: { email: string }) {
-  const [tab, setTab] = useState<"orders" | "products" | "categories" | "settings">("orders");
+  const [tab, setTab] = useState<"orders" | "products" | "categories" | "companies" | "settings">("orders");
   return (
     <div className="min-h-screen">
       <header className="border-b bg-primary text-primary-foreground">
@@ -98,12 +98,12 @@ function Dashboard({ email }: { email: string }) {
         </div>
       </header>
       <div className="mx-auto max-w-5xl px-4 py-6">
-        <div className="mb-6 flex gap-2">
-          {(["orders", "products", "categories", "settings"] as const).map((t) => (
+        <div className="mb-6 flex flex-wrap gap-2">
+          {(["orders", "products", "categories", "companies", "settings"] as const).map((t) => (
             <button key={t} onClick={() => setTab(t)} className={`rounded-full border px-4 py-1.5 text-sm capitalize ${tab === t ? "bg-primary text-primary-foreground" : "bg-card"}`}>{t}</button>
           ))}
         </div>
-        {tab === "orders" ? <Orders /> : tab === "products" ? <Products /> : tab === "categories" ? <Categories /> : <Settings />}
+        {tab === "orders" ? <Orders /> : tab === "products" ? <Products /> : tab === "categories" ? <Categories /> : tab === "companies" ? <Companies /> : <Settings />}
       </div>
     </div>
   );
@@ -342,6 +342,72 @@ function ProductList({ data, cats, onEdit, onNew, refresh }: {
         </div>
       ))}
       {!visible.length && <p className="text-muted-foreground">No products match this filter.</p>}
+    </div>
+  );
+}
+
+const VENDOR_STATUSES = ["pending", "paid", "approved", "rejected"];
+
+function Companies() {
+  const qc = useQueryClient();
+  const { data = [] } = useQuery({
+    queryKey: ["vendors"],
+    queryFn: async () => (await supabase.from("vendor_registrations").select("*").order("created_at", { ascending: false })).data ?? [],
+  });
+  const { data: cfg } = useQuery({
+    queryKey: ["vendor-cfg"],
+    queryFn: async () => {
+      const { data } = await supabase.from("store_settings").select("key,value").in("key", ["vendor_fee", "vendor_payment_info"]);
+      return Object.fromEntries((data ?? []).map((r) => [r.key, r.value]));
+    },
+  });
+  const [fee, setFee] = useState("");
+  const [info, setInfo] = useState("");
+  useEffect(() => { if (cfg) { setFee(cfg.vendor_fee ?? ""); setInfo(cfg.vendor_payment_info ?? ""); } }, [cfg]);
+  const save = async () => {
+    const { error } = await supabase.from("store_settings").upsert([{ key: "vendor_fee", value: fee }, { key: "vendor_payment_info", value: info }]);
+    if (error) toast.error(error.message); else { toast.success("Saved"); qc.invalidateQueries({ queryKey: ["vendor-cfg"] }); }
+  };
+  const paidTotal = data.filter((v) => v.status !== "pending" && v.status !== "rejected").reduce((s, v) => s + Number(v.fee_amount), 0);
+  return (
+    <div className="space-y-6">
+      <div className="rounded-xl border bg-card p-4 text-sm space-y-2">
+        <h3 className="font-semibold">Registration fee settings</h3>
+        <label className="block">Fee (PKR)<input value={fee} onChange={(e) => setFee(e.target.value)} type="number" min="0" className="mt-1 w-full rounded-lg border bg-background px-3 py-2" /></label>
+        <label className="block">Payment instructions (account number etc.)<textarea value={info} onChange={(e) => setInfo(e.target.value)} rows={2} className="mt-1 w-full rounded-lg border bg-background px-3 py-2" /></label>
+        <div className="flex items-center justify-between">
+          <button onClick={save} className={btn}>Save</button>
+          <Link to="/register" className="underline">Open registration page</Link>
+        </div>
+      </div>
+      <div>
+        <h2 className="mb-1 text-xl font-semibold">Companies ({data.length})</h2>
+        <p className="mb-3 text-sm text-muted-foreground">Fees collected: {formatPKR(paidTotal)}</p>
+        <div className="space-y-3">
+          {data.map((v) => (
+            <div key={v.id} className="rounded-xl border bg-card p-4 text-sm">
+              <div className="flex flex-wrap items-start justify-between gap-2">
+                <div>
+                  <p className="font-semibold">{v.company_name}</p>
+                  <p>{v.contact_name} · {v.phone} · {v.email}</p>
+                  {v.city && <p className="text-muted-foreground">{v.city}</p>}
+                  <p className="text-xs text-muted-foreground">{new Date(v.created_at).toLocaleString()}</p>
+                </div>
+                <select value={v.status} className="rounded-lg border bg-background px-2 py-1"
+                  onChange={async (e) => {
+                    const { error } = await supabase.from("vendor_registrations").update({ status: e.target.value }).eq("id", v.id);
+                    if (error) toast.error(error.message); else qc.invalidateQueries({ queryKey: ["vendors"] });
+                  }}>
+                  {VENDOR_STATUSES.map((s) => <option key={s}>{s}</option>)}
+                </select>
+              </div>
+              {v.products_info && <p className="mt-2 text-muted-foreground">Products: {v.products_info}</p>}
+              <p className="mt-2 border-t pt-2">Fee {formatPKR(Number(v.fee_amount))} · {v.payment_method} · Ref: <span className="font-mono">{v.payment_reference}</span></p>
+            </div>
+          ))}
+          {!data.length && <p className="text-muted-foreground">No registrations yet.</p>}
+        </div>
+      </div>
     </div>
   );
 }
