@@ -1,7 +1,8 @@
 # Roadmap
 - [x] UTL storefront (categories, cart, order) at /
 - [x] Admin at /admin (login, products, categories, images, orders, status, CSV)
-- [ ] Add sample UTL products (names, prices, photos, AI descriptions) and verify on storefront
-- [ ] Verify descriptions show on storefront and place a test order end-to-end
-- [ ] Realtime order updates in admin Orders tab
-- [ ] Admin order notification (email needs user's domain; SMS needs Twilio) — awaiting user choice
+- [x] AI description writer in admin
+- [x] Store logo: admin upload (Settings tab) + storefront header + favicon
+- [x] Sample products with photos and descriptions; test order verified end-to-end
+- [x] Realtime order updates in admin Orders tab
+- [ ] SMS order alerts to admin — blocked: needs Twilio connection (user declined) + admin phone number
