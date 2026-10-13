@@ -1,0 +1,1 @@
+delete from public.orders where customer_name='Test' and address='Karachi';
