@@ -117,6 +117,18 @@ function Orders() {
     queryKey: ["orders"],
     queryFn: async () => (await supabase.from("orders").select("*").order("created_at", { ascending: false })).data ?? [],
   });
+
+  // Live updates: refresh the list the moment a new order arrives or a status changes.
+  useEffect(() => {
+    const channel = supabase
+      .channel("admin-orders")
+      .on("postgres_changes", { event: "*", schema: "public", table: "orders" }, (payload) => {
+        qc.invalidateQueries({ queryKey: ["orders"] });
+        if (payload.eventType === "INSERT") toast.success("New order received!");
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [qc]);
   const exportCsv = () => {
     const blob = new Blob([ordersToCsv(data)], { type: "text/csv" });
     const a = document.createElement("a");
