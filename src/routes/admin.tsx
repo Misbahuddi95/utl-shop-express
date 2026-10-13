@@ -109,7 +109,7 @@ function Dashboard({ email }: { email: string }) {
   );
 }
 
-const STATUSES = ["pending", "confirmed", "shipped", "delivered", "cancelled"];
+const STATUSES = ["pending", "confirmed", "shipped", "delivered", "completed", "cancelled"];
 
 function Orders() {
   const qc = useQueryClient();
