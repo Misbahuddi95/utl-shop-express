@@ -4,6 +4,9 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import type { Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
+import { useServerFn } from "@tanstack/react-start";
+import { Sparkles } from "lucide-react";
+import { generateDescription } from "@/lib/ai.functions";
 import { formatPKR, ordersToCsv, resizeImage, type CartItem } from "@/lib/store";
 
 export const Route = createFileRoute("/admin")({
@@ -208,6 +211,20 @@ function Products() {
     queryFn: async () => (await supabase.from("products").select("*").order("created_at", { ascending: false })).data ?? [],
   });
   const refresh = () => qc.invalidateQueries({ queryKey: ["products"] });
+  const genFn = useServerFn(generateDescription);
+  const [details, setDetails] = useState("");
+  const [genBusy, setGenBusy] = useState(false);
+
+  async function generate() {
+    if (!editing) return;
+    setGenBusy(true);
+    try {
+      const r = await genFn({ data: { name: editing.name, details, category: cats.find((c) => c.id === editing.category_id)?.name ?? "", price: editing.price } });
+      if ("text" in r && r.text) { setEditing({ ...editing, description: r.text }); toast.success("Description ready"); }
+      else toast.error(r.error ?? "Failed");
+    } catch { toast.error("Something went wrong"); }
+    setGenBusy(false);
+  }
 
   async function save(e: React.FormEvent) {
     e.preventDefault();
@@ -224,6 +241,13 @@ function Products() {
     <form onSubmit={save} className="max-w-lg space-y-3">
       <h2 className="text-xl font-semibold">{editing.id ? "Edit product" : "New product"}</h2>
       <input required placeholder="Name" value={editing.name} onChange={(e) => setEditing({ ...editing, name: e.target.value })} className={input} />
+      <div className="space-y-2 rounded-xl border border-dashed bg-secondary p-3">
+        <p className="flex items-center gap-1 text-sm font-semibold"><Sparkles className="h-4 w-4" /> AI description writer</p>
+        <textarea placeholder="Product details: size, material, features, uses…" value={details} onChange={(e) => setDetails(e.target.value)} className={input} rows={3} />
+        <button type="button" onClick={generate} disabled={genBusy || !editing.name.trim()} className="rounded-full bg-accent px-4 py-2 text-sm font-semibold text-accent-foreground disabled:opacity-50">
+          {genBusy ? "Writing…" : "Generate description"}
+        </button>
+      </div>
       <textarea placeholder="Description" value={editing.description ?? ""} onChange={(e) => setEditing({ ...editing, description: e.target.value })} className={input} rows={3} />
       <input required type="number" min={0} step="1" placeholder="Price (Rs)" value={editing.price} onChange={(e) => setEditing({ ...editing, price: Number(e.target.value) })} className={input} />
       <select value={editing.category_id ?? ""} onChange={(e) => setEditing({ ...editing, category_id: e.target.value || null })} className={input}>
