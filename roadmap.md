@@ -1,3 +1,3 @@
 # Roadmap
-- [ ] UTL storefront (categories, cart, order) at /
-- [ ] Admin at /admin (login, products, categories, images, orders, status, CSV)
+- [x] UTL storefront (categories, cart, order) at /
+- [x] Admin at /admin (login, products, categories, images, orders, status, CSV)
