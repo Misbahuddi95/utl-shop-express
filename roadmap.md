@@ -10,6 +10,7 @@
 - [x] Checkout email field; order-complete status flow in admin
 
 ## Open
+- [x] 8 garment products added (Men Garments + Kids Garments categories, women's suit/kurti) with AI photos and estimated PKR prices
 - [x] Admin → Products: search + category filter chips + category-wise grouped view
 - [ ] Online payment + checkout payment button — user chose Shopify; need to ask new vs existing store (question was cancelled)
 - [ ] Marketplace idea: other companies add their own products + registration fee — blocked: awaiting user clarification
