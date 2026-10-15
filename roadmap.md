@@ -10,10 +10,12 @@
 - [x] Checkout email field; order-complete status flow in admin
 
 ## Open
+- [ ] Separate Admin Orders page: customer orders, quantities, totals and manual payment status
 - [x] 8 garment products added (Men Garments + Kids Garments categories, women's suit/kurti) with AI photos and estimated PKR prices
 - [x] Admin → Products: search + category filter chips + category-wise grouped view
 - [ ] Online payment + checkout payment button — user chose Shopify; need to ask new vs existing store (question was cancelled)
-- [ ] Marketplace idea: other companies add their own products + registration fee — blocked: awaiting user clarification
+- [ ] Company portal: own login, own products, direct publication after registration fee verification
+- [ ] Women and Kids garments: replace flat-lay photos with AI model photos; keep existing estimated prices
 - [ ] Real prices for 16 UTL + women products — blocked: need user's actual price list (only 8 prices known from storefront image)
 - [ ] Replace women products' AI photos with real photos — blocked: need user to upload real photos
 - [ ] Order-complete auto email to customer — blocked: needs custom domain setup

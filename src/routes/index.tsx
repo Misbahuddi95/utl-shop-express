@@ -123,7 +123,7 @@ function Store() {
       </main>
 
       <footer className="border-t py-6 text-center text-xs text-muted-foreground">
-        © UTL Store · <Link to="/register" className="underline">Sell on UTL</Link> · <Link to="/admin" className="underline">Admin</Link>
+        © UTL Store · <Link to="/register" className="underline">Sell on UTL</Link> · <Link to="/company" className="underline">Company portal</Link> · <Link to="/admin" className="underline">Admin</Link>
       </footer>
 
       {open && (
