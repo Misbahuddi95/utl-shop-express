@@ -8,10 +8,7 @@ import {
   Scripts,
   type ErrorComponentProps,
 } from "@tanstack/react-router";
-import { useEffect, useState, type ReactNode } from "react";
-import type { Session } from "@supabase/supabase-js";
-import { supabase } from "@/integrations/supabase/client";
-import { SessionContext } from "@/lib/session";
+import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { Toaster } from "@/components/ui/sonner";
@@ -117,27 +114,12 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-  const router = useRouter();
-  const [session, setSession] = useState<Session | null | undefined>(undefined);
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => setSession(data.session));
-    const { data } = supabase.auth.onAuthStateChange((event, next) => {
-      setSession(next);
-      if (!["SIGNED_IN", "SIGNED_OUT", "USER_UPDATED"].includes(event)) return;
-      router.invalidate();
-      if (event === "SIGNED_OUT") queryClient.clear();
-      else queryClient.invalidateQueries();
-    });
-    return () => data.subscription.unsubscribe();
-  }, [queryClient, router]);
 
   return (
     <QueryClientProvider client={queryClient}>
-      <SessionContext.Provider value={session}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
       <Toaster position="top-center" />
-      </SessionContext.Provider>
     </QueryClientProvider>
   );
 }

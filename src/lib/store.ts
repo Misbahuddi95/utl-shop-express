@@ -42,9 +42,7 @@ export function resizeImage(file: File, max = 700): Promise<string> {
       const c = document.createElement("canvas");
       c.width = img.width * scale;
       c.height = img.height * scale;
-      const context = c.getContext("2d");
-      if (!context) { reject(new Error("Photo could not be processed")); return; }
-      context.drawImage(img, 0, 0, c.width, c.height);
+      c.getContext("2d")!.drawImage(img, 0, 0, c.width, c.height);
       resolve(c.toDataURL("image/jpeg", 0.8));
     };
     img.onerror = reject;

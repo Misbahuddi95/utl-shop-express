@@ -4,8 +4,6 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { formatPKR } from "@/lib/store";
-import { useStoreSession } from "@/lib/session";
-import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/register")({
   head: () => ({
@@ -24,7 +22,6 @@ export const Route = createFileRoute("/register")({
 const input = "w-full rounded-lg border bg-background px-3 py-2 text-sm";
 
 function Register() {
-  const session = useStoreSession();
   const [done, setDone] = useState(false);
   const [busy, setBusy] = useState(false);
   const { data: cfg } = useQuery({
@@ -42,7 +39,6 @@ function Register() {
     const s = (k: string) => String(f.get(k) ?? "").trim();
     setBusy(true);
     const { error } = await supabase.from("vendor_registrations").insert({
-      user_id: session?.user.id ?? null,
       company_name: s("company"), contact_name: s("contact"), email: s("email").toLowerCase(), phone: s("phone"),
       city: s("city") || null, products_info: s("products") || null, fee_amount: fee,
       payment_method: s("method"), payment_reference: s("ref"),
@@ -66,12 +62,10 @@ function Register() {
             <h1 className="font-display text-2xl font-semibold">Registration received!</h1>
             <p className="mt-2 text-muted-foreground">We will verify your payment and contact you soon.</p>
             <Link to="/" className="mt-4 inline-block underline">Back to store</Link>
-            <Link to="/company" className="mt-4 block underline">Company portal</Link>
           </div>
         ) : (
           <>
             <h1 className="font-display text-3xl font-semibold">Sell your products on UTL</h1>
-            {!session && <Button asChild variant="outline" className="mt-3"><Link to="/company">Create company account / Sign in</Link></Button>}
             <p className="mt-2 text-muted-foreground">Register your company. Registration fee: <b className="text-foreground">{formatPKR(fee)}</b></p>
             {(cfg?.["vendor_bank_details"] || cfg?.["vendor_mobile_details"] || cfg?.["vendor_payment_info"]) && (
               <div className="mt-4 space-y-3 rounded-xl border border-accent bg-accent/10 p-4 text-sm">
