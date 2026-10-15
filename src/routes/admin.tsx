@@ -1,13 +1,14 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useLocation } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import type { Session } from "@supabase/supabase-js";
+import { useStoreSession } from "@/lib/session";
+import { Orders } from "@/components/store/orders";
 import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";
 import { Sparkles } from "lucide-react";
 import { generateDescription } from "@/lib/ai.functions";
-import { formatPKR, ordersToCsv, resizeImage, useStoreLogo, type CartItem } from "@/lib/store";
+import { formatPKR, resizeImage, useStoreLogo } from "@/lib/store";
 
 export const Route = createFileRoute("/admin")({
   ssr: false,
@@ -29,14 +30,10 @@ const input = "w-full rounded-lg border bg-card px-3 py-2 text-sm";
 const btn = "rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground disabled:opacity-50";
 
 function Admin() {
-  const [session, setSession] = useState<Session | null | undefined>(undefined);
+  const session = useStoreSession();
+  const location = useLocation();
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
 
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => setSession(data.session));
-    const { data } = supabase.auth.onAuthStateChange((_e, s) => setSession(s));
-    return () => data.subscription.unsubscribe();
-  }, []);
   useEffect(() => {
     if (!session) { setIsAdmin(null); return; }
     supabase.from("user_roles").select("role").eq("user_id", session.user.id).eq("role", "admin")
@@ -49,6 +46,7 @@ function Admin() {
   if (!isAdmin) return (
     <div className="p-6"><p>This account is not an admin.</p><button className={btn + " mt-4"} onClick={() => supabase.auth.signOut()}>Sign out</button></div>
   );
+  if (location.pathname === "/admin/orders") return <Outlet />;
   return <Dashboard email={session.user.email ?? ""} />;
 }
 
@@ -99,74 +97,12 @@ function Dashboard({ email }: { email: string }) {
       </header>
       <div className="mx-auto max-w-5xl px-4 py-6">
         <div className="mb-6 flex flex-wrap gap-2">
+          <Link to="/admin/orders" className="rounded-md border px-4 py-1.5 text-sm">Orders page</Link>
           {(["orders", "products", "categories", "companies", "settings"] as const).map((t) => (
             <button key={t} onClick={() => setTab(t)} className={`rounded-full border px-4 py-1.5 text-sm capitalize ${tab === t ? "bg-primary text-primary-foreground" : "bg-card"}`}>{t}</button>
           ))}
         </div>
         {tab === "orders" ? <Orders /> : tab === "products" ? <Products /> : tab === "categories" ? <Categories /> : tab === "companies" ? <Companies /> : <Settings />}
-      </div>
-    </div>
-  );
-}
-
-const STATUSES = ["pending", "confirmed", "shipped", "delivered", "completed", "cancelled"];
-
-function Orders() {
-  const qc = useQueryClient();
-  const { data = [] } = useQuery({
-    queryKey: ["orders"],
-    queryFn: async () => (await supabase.from("orders").select("*").order("created_at", { ascending: false })).data ?? [],
-  });
-
-  // Live updates: refresh the list the moment a new order arrives or a status changes.
-  useEffect(() => {
-    const channel = supabase
-      .channel("admin-orders")
-      .on("postgres_changes", { event: "*", schema: "public", table: "orders" }, (payload) => {
-        qc.invalidateQueries({ queryKey: ["orders"] });
-        if (payload.eventType === "INSERT") toast.success("New order received!");
-      })
-      .subscribe();
-    return () => { supabase.removeChannel(channel); };
-  }, [qc]);
-  const exportCsv = () => {
-    const blob = new Blob([ordersToCsv(data)], { type: "text/csv" });
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = `utl-orders-${new Date().toISOString().slice(0, 10)}.csv`;
-    a.click();
-  };
-  return (
-    <div>
-      <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-xl font-semibold">Orders ({data.length})</h2>
-        <button onClick={exportCsv} disabled={!data.length} className={btn}>Export CSV</button>
-      </div>
-      <div className="space-y-3">
-        {data.map((o) => (
-          <div key={o.id} className="rounded-xl border bg-card p-4 text-sm">
-            <div className="flex flex-wrap items-start justify-between gap-2">
-              <div>
-                <p className="font-semibold">{o.customer_name} · {o.phone}</p>
-                <p className="text-muted-foreground">{o.address}</p>
-                <p className="text-xs text-muted-foreground">{new Date(o.created_at).toLocaleString()}</p>
-              </div>
-              <select value={o.status} className="rounded-lg border bg-background px-2 py-1"
-                onChange={async (e) => {
-                  const { error } = await supabase.from("orders").update({ status: e.target.value }).eq("id", o.id);
-                  if (error) toast.error(error.message); else qc.invalidateQueries({ queryKey: ["orders"] });
-                }}>
-                {STATUSES.map((s) => <option key={s}>{s}</option>)}
-              </select>
-            </div>
-            <ul className="mt-2 border-t pt-2">
-              {(o.items as unknown as CartItem[]).map((i) => <li key={i.id}>{i.name} × {i.qty} — {formatPKR(i.price * i.qty)}</li>)}
-            </ul>
-            {o.notes && <p className="mt-1 italic text-muted-foreground">Note: {o.notes}</p>}
-            <p className="mt-2 font-bold">Total: {formatPKR(Number(o.total))}</p>
-          </div>
-        ))}
-        {!data.length && <p className="text-muted-foreground">No orders yet.</p>}
       </div>
     </div>
   );
@@ -306,7 +242,7 @@ function ProductList({ data, cats, onEdit, onNew, refresh }: {
   for (const p of visible) {
     const key = catName(p.category_id);
     if (!groups.has(key)) groups.set(key, []);
-    groups.get(key)!.push(p);
+    groups.get(key)?.push(p);
   }
 
   return (
