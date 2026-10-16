@@ -110,6 +110,7 @@ function Dashboard({ email }: { email: string }) {
 }
 
 const STATUSES = ["pending", "confirmed", "shipped", "delivered", "completed", "cancelled"];
+const PAYMENT_STATUSES = ["unpaid", "paid", "refunded"];
 
 function Orders() {
   const qc = useQueryClient();
