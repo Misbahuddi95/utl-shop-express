@@ -61,7 +61,7 @@ function Login() {
       ? await supabase.auth.signUp({ email, password, options: { emailRedirectTo: window.location.origin + "/portal" } })
       : await supabase.auth.signInWithPassword({ email, password });
     setBusy(false);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     if (up) toast.success("Check your email to confirm your account, then sign in.");
   }
   return (
@@ -114,7 +114,7 @@ function RegisterForm({ userId, email }: { userId: string; email: string }) {
       city: s("city") || null, products_info: s("products") || null, fee_amount: fee, payment_method: s("method"), payment_reference: s("ref"),
     });
     setBusy(false);
-    if (error) return toast.error("Registration failed. Please check your details.");
+    if (error) { toast.error("Registration failed. Please check your details."); return; }
     qc.invalidateQueries({ queryKey: ["my-company"] });
   }
   return (
@@ -170,7 +170,7 @@ function MyProducts({ vendorId, company }: { vendorId: string; company: string }
     setBusy(true);
     const { error } = edit ? await supabase.from("products").update(row).eq("id", edit.id) : await supabase.from("products").insert(row);
     setBusy(false);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success(edit ? "Product updated" : "Product added to the store");
     el.reset(); setEdit(null); setImg(null); refresh();
   }
