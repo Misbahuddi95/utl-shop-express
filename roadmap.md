@@ -20,4 +20,3 @@
 - [ ] Order-complete auto email to customer — blocked: needs custom domain setup
 - [ ] SMS order alerts — blocked: Twilio connector declined + admin phone number needed
 - [x] Admin Orders: item quantities table, totals, payment status (unpaid/paid/refunded)
-- [x] UTL logo badge on UTL's own product photos
