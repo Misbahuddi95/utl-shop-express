@@ -186,7 +186,8 @@ function Orders() {
             {o.notes && <p className="mt-1 italic text-muted-foreground">Note: {o.notes}</p>}
             <p className="mt-2 font-bold">{items.reduce((s, i) => s + i.qty, 0)} items · Total: {formatPKR(Number(o.total))}</p>
           </div>
-        ))}
+          );
+        })}
         {!data.length && <p className="text-muted-foreground">No orders yet.</p>}
       </div>
     </div>

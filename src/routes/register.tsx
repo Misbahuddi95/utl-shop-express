@@ -61,7 +61,7 @@ function Register() {
           <div className="rounded-xl border bg-card p-6 text-center">
             <h1 className="font-display text-2xl font-semibold">Registration received!</h1>
             <p className="mt-2 text-muted-foreground">We will verify your payment and contact you soon.</p>
-            <Link to="/" className="mt-4 inline-block underline">Back to store</Link>
+            <Link to="/portal" className="mt-4 inline-block underline">Open company portal</Link>
           </div>
         ) : (
           <>
