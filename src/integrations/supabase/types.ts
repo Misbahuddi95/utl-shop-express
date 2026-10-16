@@ -44,6 +44,7 @@ export type Database = {
           id: string
           items: Json
           notes: string | null
+          payment_status: string
           phone: string
           status: string
           total: number
@@ -56,6 +57,7 @@ export type Database = {
           id?: string
           items: Json
           notes?: string | null
+          payment_status?: string
           phone: string
           status?: string
           total: number
@@ -68,6 +70,7 @@ export type Database = {
           id?: string
           items?: Json
           notes?: string | null
+          payment_status?: string
           phone?: string
           status?: string
           total?: number
@@ -84,6 +87,7 @@ export type Database = {
           in_stock: boolean
           name: string
           price: number
+          vendor_id: string | null
         }
         Insert: {
           category_id?: string | null
@@ -94,6 +98,7 @@ export type Database = {
           in_stock?: boolean
           name: string
           price?: number
+          vendor_id?: string | null
         }
         Update: {
           category_id?: string | null
@@ -104,6 +109,7 @@ export type Database = {
           in_stock?: boolean
           name?: string
           price?: number
+          vendor_id?: string | null
         }
         Relationships: [
           {
@@ -111,6 +117,13 @@ export type Database = {
             columns: ["category_id"]
             isOneToOne: false
             referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "products_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendor_registrations"
             referencedColumns: ["id"]
           },
         ]
@@ -162,6 +175,7 @@ export type Database = {
           phone: string
           products_info: string | null
           status: string
+          user_id: string | null
         }
         Insert: {
           city?: string | null
@@ -176,6 +190,7 @@ export type Database = {
           phone: string
           products_info?: string | null
           status?: string
+          user_id?: string | null
         }
         Update: {
           city?: string | null
@@ -190,6 +205,7 @@ export type Database = {
           phone?: string
           products_info?: string | null
           status?: string
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -198,6 +214,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      can_manage_vendor: { Args: { _vendor_id: string }; Returns: boolean }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

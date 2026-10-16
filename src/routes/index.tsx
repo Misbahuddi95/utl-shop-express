@@ -101,8 +101,11 @@ function Store() {
           <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
             {shown.map((p) => (
               <article key={p.id} className="flex flex-col overflow-hidden rounded-2xl border bg-card">
-                <div className="aspect-square bg-muted">
+                <div className="relative aspect-square bg-muted">
                   {p.image_url && <img src={p.image_url} alt={p.name} className="h-full w-full object-cover" loading="lazy" />}
+                  {!p.vendor_id && logo && (
+                    <img src={logo} alt="UTL" className="absolute left-2 top-2 h-9 w-9 rounded-full bg-background/90 object-contain p-1 shadow" />
+                  )}
                 </div>
                 <div className="flex flex-1 flex-col p-3">
                   <h3 className="font-sans text-sm font-semibold">{p.name}</h3>
@@ -123,7 +126,7 @@ function Store() {
       </main>
 
       <footer className="border-t py-6 text-center text-xs text-muted-foreground">
-        © UTL Store · <Link to="/register" className="underline">Sell on UTL</Link> · <Link to="/admin" className="underline">Admin</Link>
+        © UTL Store · <Link to="/portal" className="underline">Sell on UTL</Link> · <Link to="/admin" className="underline">Admin</Link>
       </footer>
 
       {open && (

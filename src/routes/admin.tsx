@@ -110,6 +110,7 @@ function Dashboard({ email }: { email: string }) {
 }
 
 const STATUSES = ["pending", "confirmed", "shipped", "delivered", "completed", "cancelled"];
+const PAYMENT_STATUSES = ["unpaid", "paid", "refunded"];
 
 function Orders() {
   const qc = useQueryClient();
@@ -142,30 +143,51 @@ function Orders() {
         <h2 className="text-xl font-semibold">Orders ({data.length})</h2>
         <button onClick={exportCsv} disabled={!data.length} className={btn}>Export CSV</button>
       </div>
+      <div className="mb-4 grid grid-cols-3 gap-2 text-sm">
+        <div className="rounded-xl border bg-card p-3"><p className="text-muted-foreground">Total sales</p><p className="font-bold">{formatPKR(data.filter((o) => o.status !== "cancelled").reduce((s, o) => s + Number(o.total), 0))}</p></div>
+        <div className="rounded-xl border bg-card p-3"><p className="text-muted-foreground">Paid</p><p className="font-bold">{formatPKR(data.filter((o) => o.payment_status === "paid").reduce((s, o) => s + Number(o.total), 0))}</p></div>
+        <div className="rounded-xl border bg-card p-3"><p className="text-muted-foreground">Unpaid</p><p className="font-bold">{formatPKR(data.filter((o) => o.payment_status !== "paid" && o.status !== "cancelled").reduce((s, o) => s + Number(o.total), 0))}</p></div>
+      </div>
       <div className="space-y-3">
-        {data.map((o) => (
+        {data.map((o) => {
+          const items = o.items as unknown as CartItem[];
+          const update = async (patch: { status?: string; payment_status?: string }) => {
+            const { error } = await supabase.from("orders").update(patch).eq("id", o.id);
+            if (error) toast.error(error.message); else qc.invalidateQueries({ queryKey: ["orders"] });
+          };
+          return (
           <div key={o.id} className="rounded-xl border bg-card p-4 text-sm">
             <div className="flex flex-wrap items-start justify-between gap-2">
               <div>
                 <p className="font-semibold">{o.customer_name} · {o.phone}</p>
+                {o.customer_email && <p className="text-muted-foreground">{o.customer_email}</p>}
                 <p className="text-muted-foreground">{o.address}</p>
                 <p className="text-xs text-muted-foreground">{new Date(o.created_at).toLocaleString()}</p>
               </div>
-              <select value={o.status} className="rounded-lg border bg-background px-2 py-1"
-                onChange={async (e) => {
-                  const { error } = await supabase.from("orders").update({ status: e.target.value }).eq("id", o.id);
-                  if (error) toast.error(error.message); else qc.invalidateQueries({ queryKey: ["orders"] });
-                }}>
-                {STATUSES.map((s) => <option key={s}>{s}</option>)}
-              </select>
+              <div className="flex flex-col gap-1">
+                <label className="text-xs">Order
+                  <select value={o.status} className="ml-1 rounded-lg border bg-background px-2 py-1" onChange={(e) => update({ status: e.target.value })}>
+                    {STATUSES.map((s) => <option key={s}>{s}</option>)}
+                  </select>
+                </label>
+                <label className="text-xs">Payment
+                  <select value={o.payment_status} className={`ml-1 rounded-lg border px-2 py-1 ${o.payment_status === "paid" ? "bg-primary text-primary-foreground" : "bg-background"}`} onChange={(e) => update({ payment_status: e.target.value })}>
+                    {PAYMENT_STATUSES.map((s) => <option key={s}>{s}</option>)}
+                  </select>
+                </label>
+              </div>
             </div>
-            <ul className="mt-2 border-t pt-2">
-              {(o.items as unknown as CartItem[]).map((i) => <li key={i.id}>{i.name} × {i.qty} — {formatPKR(i.price * i.qty)}</li>)}
-            </ul>
+            <table className="mt-2 w-full border-t text-left">
+              <thead className="text-xs text-muted-foreground"><tr><th className="py-1">Item</th><th>Qty</th><th className="text-right">Amount</th></tr></thead>
+              <tbody>
+                {items.map((i) => <tr key={i.id}><td className="py-0.5">{i.name}</td><td>{i.qty}</td><td className="text-right">{formatPKR(i.price * i.qty)}</td></tr>)}
+              </tbody>
+            </table>
             {o.notes && <p className="mt-1 italic text-muted-foreground">Note: {o.notes}</p>}
-            <p className="mt-2 font-bold">Total: {formatPKR(Number(o.total))}</p>
+            <p className="mt-2 font-bold">{items.reduce((s, i) => s + i.qty, 0)} items · Total: {formatPKR(Number(o.total))}</p>
           </div>
-        ))}
+          );
+        })}
         {!data.length && <p className="text-muted-foreground">No orders yet.</p>}
       </div>
     </div>
