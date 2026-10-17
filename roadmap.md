@@ -15,6 +15,7 @@
 - [ ] Online payment + checkout payment button — user chose Shopify; need to ask new vs existing store (question was cancelled)
 - [x] Company portal (/portal): own login, registration, own products published directly once fee marked paid
 - [x] Test company registration, simulated fee verification (paid → approved), and own-product publication through the signed-in portal; demo product and registration removed to restore fee total
+- [ ] Company approval auto-email with portal link, followed by approval-email → company portal → product publication test — blocked: user-owned email sender domain must be configured
 - [ ] Women and Kids garments model photos — 4 done (dupatta, frock, boys tee, hoodie); remaining women items await build credits
 - [ ] Real prices for 16 UTL + women products — blocked: need user's actual price list (only 8 prices known from storefront image)
 - [ ] Replace women products' AI photos with real photos — blocked: need user to upload real photos
