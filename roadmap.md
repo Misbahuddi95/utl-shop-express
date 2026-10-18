@@ -10,6 +10,7 @@
 - [x] Checkout email field; order-complete status flow in admin
 
 ## Open
+- [ ] Company portal forgot-password and secure reset page; verify reset request and recovery form (inbox-link completion requires recipient access).
 - [x] 8 garment products added (Men Garments + Kids Garments categories, women's suit/kurti) with AI photos and estimated PKR prices
 - [x] Admin → Products: search + category filter chips + category-wise grouped view
 - [ ] Online payment + checkout payment button — user chose Shopify; need to ask new vs existing store (question was cancelled)
