@@ -10,6 +10,7 @@
 - [x] Checkout email field; order-complete status flow in admin
 
 ## Open
+- [ ] Company dashboard: own products, own order items and approval status, with ownership checks and signed-in verification.
 - [x] Company portal forgot-password and public secure reset page; tests passed, reset request accepted, invalid links blocked.
 - [ ] Complete company password recovery through the recipient's inbox link — blocked: recipient must open the email; delivery and password-change completion not verified.
 - [x] 8 garment products added (Men Garments + Kids Garments categories, women's suit/kurti) with AI photos and estimated PKR prices
