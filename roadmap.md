@@ -10,7 +10,8 @@
 - [x] Checkout email field; order-complete status flow in admin
 
 ## Open
-- [ ] Company portal forgot-password and secure reset page; verify reset request and recovery form (inbox-link completion requires recipient access).
+- [x] Company portal forgot-password and public secure reset page; tests passed, reset request accepted, invalid links blocked.
+- [ ] Complete company password recovery through the recipient's inbox link — blocked: recipient must open the email; delivery and password-change completion not verified.
 - [x] 8 garment products added (Men Garments + Kids Garments categories, women's suit/kurti) with AI photos and estimated PKR prices
 - [x] Admin → Products: search + category filter chips + category-wise grouped view
 - [ ] Online payment + checkout payment button — user chose Shopify; need to ask new vs existing store (question was cancelled)
