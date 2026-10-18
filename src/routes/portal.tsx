@@ -5,6 +5,8 @@ import { toast } from "sonner";
 import type { Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { formatPKR, resizeImage } from "@/lib/store";
+import { Button } from "@/components/ui/button";
+import { recoveryRedirect } from "@/lib/password-recovery";
 
 export const Route = createFileRoute("/portal")({
   ssr: false,
@@ -25,9 +27,13 @@ const input = "w-full rounded-lg border bg-background px-3 py-2 text-sm";
 const btn = "rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground disabled:opacity-50";
 
 function Portal() {
+  const qc = useQueryClient();
   const [session, setSession] = useState<Session | null | undefined>(undefined);
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => setSession(data.session));
+    supabase.auth.getUser().then(({ data }) => {
+      if (!data.user) setSession(null);
+      else supabase.auth.getSession().then(({ data: current }) => setSession(current.session));
+    });
     const { data } = supabase.auth.onAuthStateChange((_e, s) => setSession(s));
     return () => data.subscription.unsubscribe();
   }, []);
@@ -38,7 +44,7 @@ function Portal() {
           <Link to="/" className="font-display text-lg font-semibold">UTL Store</Link>
           <div className="flex items-center gap-3 text-xs">
             <span>Company Portal</span>
-            {session && <button className="underline" onClick={() => supabase.auth.signOut()}>Sign out</button>}
+            {session && <Button variant="ghost" onClick={async () => { await qc.cancelQueries(); qc.clear(); await supabase.auth.signOut(); }}>Sign out</Button>}
           </div>
         </div>
       </header>
@@ -51,28 +57,48 @@ function Portal() {
 
 function Login() {
   const [up, setUp] = useState(false);
+  const [forgot, setForgot] = useState(false);
+  const [sent, setSent] = useState(false);
+  const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const f = new FormData(e.currentTarget);
     const email = String(f.get("email")), password = String(f.get("password"));
     setBusy(true);
+    setError("");
+    if (forgot) {
+      try {
+        const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: recoveryRedirect(window.location.origin) });
+        if (resetError) setError(resetError.message);
+        else setSent(true);
+      } catch { setError("Unable to send reset link. Please try again."); }
+      finally { setBusy(false); }
+      return;
+    }
+    try {
     const { error } = up
       ? await supabase.auth.signUp({ email, password, options: { emailRedirectTo: window.location.origin + "/portal" } })
       : await supabase.auth.signInWithPassword({ email, password });
     setBusy(false);
     if (error) { toast.error(error.message); return; }
     if (up) toast.success("Check your email to confirm your account, then sign in.");
+    } catch { setError("Unable to sign in. Please try again."); }
+    finally { setBusy(false); }
   }
   return (
     <form onSubmit={submit} className="mx-auto max-w-sm space-y-3 rounded-2xl border bg-card p-6">
-      <h1 className="text-2xl font-semibold">{up ? "Create company account" : "Company sign in"}</h1>
-      <input name="email" type="email" required placeholder="Email" className={input} />
-      <input name="password" type="password" required minLength={6} placeholder="Password" className={input} />
-      <button disabled={busy} className={btn + " w-full"}>{up ? "Create account" : "Sign in"}</button>
-      <button type="button" onClick={() => setUp(!up)} className="w-full text-xs text-muted-foreground underline">
+      <h1 className="text-2xl font-semibold">{forgot ? "Forgot password" : up ? "Create company account" : "Company sign in"}</h1>
+      {sent ? <p role="status" className="text-sm text-muted-foreground">If an account exists for this email, a password reset link has been sent. Check your inbox and spam folder.</p> : <>
+      <input name="email" type="email" autoComplete="email" aria-label="Email" required placeholder="Email" className={input} />
+      {!forgot && <input name="password" type="password" autoComplete={up ? "new-password" : "current-password"} aria-label="Password" required minLength={6} placeholder="Password" className={input} />}
+      <Button disabled={busy} className="w-full">{busy ? "Please wait…" : forgot ? "Send reset link" : up ? "Create account" : "Sign in"}</Button>
+      </>}
+      {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
+      {!up && !forgot && <Button type="button" variant="link" className="w-full" onClick={() => { setForgot(true); setError(""); }}>Forgot password?</Button>}
+      {forgot ? <Button type="button" variant="link" className="w-full" onClick={() => { setForgot(false); setSent(false); setError(""); }}>Back to sign in</Button> : <Button type="button" variant="link" onClick={() => { setUp(!up); setError(""); }} className="w-full text-xs">
         {up ? "Already have an account? Sign in" : "New company? Create an account"}
-      </button>
+      </Button>}
     </form>
   );
 }

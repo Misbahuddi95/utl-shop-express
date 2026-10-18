@@ -8,3 +8,5 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Company password recovery uses a public `/reset-password` page and Cloud Auth recovery sessions, not company approval status; account recovery must remain available before and after approval.
