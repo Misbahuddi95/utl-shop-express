@@ -43,6 +43,13 @@
       "when": 1791907783049,
       "tag": "0005_vendor_registrations",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1792295098399,
+      "tag": "0006_company_order_dashboard",
+      "breakpoints": true
     }
   ]
 }

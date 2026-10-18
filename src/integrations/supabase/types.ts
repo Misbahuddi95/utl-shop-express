@@ -215,6 +215,18 @@ export type Database = {
     }
     Functions: {
       can_manage_vendor: { Args: { _vendor_id: string }; Returns: boolean }
+      company_orders: {
+        Args: { _vendor_id: string }
+        Returns: {
+          created_at: string
+          customer_name: string
+          id: string
+          items: Json
+          payment_status: string
+          status: string
+          total: number
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
