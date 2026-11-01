@@ -79,8 +79,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "UTL Online Store" },
-      { name: "description", content: "Shop UTL products online." },
+      { title: "UTL Online Store | Kids Fashion, Frocks, Hoodies & Dupatta in Pakistan" },
+      { name: "description", content: "Shop kids fashion, girls frocks, boys t-shirts, hoodies and dupatta online at UTL Online Store. Easy ordering with delivery across Pakistan." },
+      { property: "og:site_name", content: "UTL Online Store" },
     ],
     links: [
       {

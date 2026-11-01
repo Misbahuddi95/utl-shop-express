@@ -13,6 +13,7 @@ export const Route = createFileRoute("/reset-password")({
     { property: "og:description", content: "Recover access to your UTL company account." },
     { property: "og:type", content: "website" },
     { name: "twitter:card", content: "summary" },
+    { name: "robots", content: "noindex, nofollow" },
   ] }),
   component: ResetPassword,
 });

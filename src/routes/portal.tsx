@@ -18,6 +18,7 @@ export const Route = createFileRoute("/portal")({
       { property: "og:description", content: "Register your company and manage your own products on UTL." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
+      { name: "robots", content: "noindex, nofollow" },
     ],
   }),
   component: Portal,

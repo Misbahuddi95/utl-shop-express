@@ -19,7 +19,7 @@ export const Route = createFileRoute("/admin")({
       { property: "og:description", content: "Manage UTL products, categories and orders." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
-      { name: "robots", content: "noindex" },
+      { name: "robots", content: "noindex, nofollow" },
     ],
   }),
   component: Admin,

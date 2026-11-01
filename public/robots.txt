@@ -1,14 +1,26 @@
 User-agent: Googlebot
 Allow: /
+Disallow: /portal
+Disallow: /reset-password
 
 User-agent: Bingbot
 Allow: /
+Disallow: /portal
+Disallow: /reset-password
 
 User-agent: Twitterbot
 Allow: /
+Disallow: /portal
+Disallow: /reset-password
 
 User-agent: facebookexternalhit
 Allow: /
+Disallow: /portal
+Disallow: /reset-password
 
 User-agent: *
 Allow: /
+Disallow: /portal
+Disallow: /reset-password
+
+Sitemap: https://utl-shop-express.lovable.app/sitemap.xml
