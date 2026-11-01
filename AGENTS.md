@@ -10,3 +10,4 @@
 <!-- LOVABLE:END -->
 
 - Company password recovery uses a public `/reset-password` page and Cloud Auth recovery sessions, not company approval status; account recovery must remain available before and after approval.
+- Keep the requested homepage-only sitemap in `public/sitemap.xml`; omit lastmod unless an authoritative page-specific content timestamp exists.

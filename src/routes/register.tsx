@@ -14,6 +14,7 @@ export const Route = createFileRoute("/register")({
       { property: "og:description", content: "Register your company to sell products on the UTL Online Store." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
+      { name: "robots", content: "noindex, nofollow" },
     ],
   }),
   component: Register,

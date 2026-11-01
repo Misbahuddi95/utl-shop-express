@@ -9,13 +9,36 @@ import { cartTotal, formatPKR, useCart, useStoreLogo } from "@/lib/store";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "UTL Online Store — Shop & order online" },
-      { name: "description", content: "Browse UTL products by category, add to cart and place your order online." },
-      { property: "og:title", content: "UTL Online Store" },
-      { property: "og:description", content: "Browse UTL products and place your order online." },
+      { title: "UTL Online Store | Kids Fashion, Frocks, Hoodies & Dupatta in Pakistan" },
+      { name: "description", content: "Shop kids fashion, girls frocks, boys t-shirts, hoodies and dupatta online at UTL Online Store. Easy ordering with delivery across Pakistan." },
+      { property: "og:title", content: "UTL Online Store | Kids Fashion, Frocks, Hoodies & Dupatta in Pakistan" },
+      { property: "og:description", content: "Shop kids fashion, girls frocks, boys t-shirts, hoodies and dupatta online at UTL Online Store. Easy ordering with delivery across Pakistan." },
+      { property: "og:url", content: "https://utl-shop-express.lovable.app/" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
+    links: [{ rel: "canonical", href: "https://utl-shop-express.lovable.app/" }],
+    scripts: [{
+      type: "application/ld+json",
+      children: JSON.stringify({
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://utl-shop-express.lovable.app/#organization",
+            name: "UTL Online Store",
+            url: "https://utl-shop-express.lovable.app/",
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://utl-shop-express.lovable.app/#website",
+            name: "UTL Online Store",
+            url: "https://utl-shop-express.lovable.app/",
+            publisher: { "@id": "https://utl-shop-express.lovable.app/#organization" },
+          },
+        ],
+      }),
+    }],
   }),
   component: Store,
 });
@@ -83,7 +106,7 @@ function Store() {
       <section className="bg-primary text-primary-foreground">
         <div className="mx-auto max-w-6xl px-4 py-12 md:py-16">
           <p className="text-sm uppercase tracking-widest text-accent">Online Store</p>
-          <h1 className="mt-2 max-w-xl text-4xl font-semibold leading-tight md:text-5xl">Quality products, delivered to your door.</h1>
+          <h1 className="mt-2 max-w-xl text-4xl font-semibold leading-tight md:text-5xl">Kids Fashion & Everyday Essentials, Delivered Across Pakistan</h1>
           <p className="mt-3 max-w-md opacity-80">Choose items, add them to your cart, and place your order in a minute.</p>
         </div>
       </section>

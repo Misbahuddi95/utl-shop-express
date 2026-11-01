@@ -1,6 +1,7 @@
 # UTL Store — Task Roadmap
 
 ## Done
+- [x] SEO-only update: UTL titles/descriptions and homepage heading, canonical URL, private-page noindex, crawler rules, homepage sitemap, Organization and WebSite structured data.
 - [x] Storefront (categories, cart, COD checkout, PKR prices)
 - [x] Admin panel (login, Orders/Products/Categories/Settings tabs)
 - [x] AI description writer (Lovable AI Gateway)
