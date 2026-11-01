@@ -27,6 +27,9 @@ function Store() {
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState<"cart" | "checkout" | "done">("cart");
   const [sending, setSending] = useState(false);
+  const [view, setView] = useState<any>(null);
+  const [zoom, setZoom] = useState(false);
+  const [origin, setOrigin] = useState("50% 50%");
 
   const { data: cats = [] } = useQuery({
     queryKey: ["categories"],
@@ -101,9 +104,9 @@ function Store() {
           <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
             {shown.map((p) => (
               <article key={p.id} className="flex flex-col overflow-hidden rounded-2xl border bg-card">
-                <div className="aspect-square bg-muted">
-                  {p.image_url && <img src={p.image_url} alt={p.name} className="h-full w-full object-cover" loading="lazy" />}
-                </div>
+                <button type="button" onClick={() => { setView(p); setZoom(false); }} className="aspect-square overflow-hidden bg-muted" aria-label={`View ${p.name}`}>
+                  {p.image_url && <img src={p.image_url} alt={p.name} className="h-full w-full object-cover transition-transform duration-300 hover:scale-110" loading="lazy" />}
+                </button>
                 <div className="flex flex-1 flex-col p-3">
                   <h3 className="font-sans text-sm font-semibold">{p.name}</h3>
                   {p.description && <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{p.description}</p>}
@@ -125,6 +128,34 @@ function Store() {
       <footer className="border-t py-6 text-center text-xs text-muted-foreground">
         © UTL Store · <Link to="/portal" className="underline">Sell on UTL</Link>
       </footer>
+
+      {view && (
+        <div className="fixed inset-0 z-40 flex items-center justify-center bg-foreground/60 p-3" onClick={() => setView(null)}>
+          <div className="flex max-h-full w-full max-w-3xl flex-col overflow-y-auto rounded-2xl bg-background md:flex-row" onClick={(e) => e.stopPropagation()}>
+            <div
+              className={`relative aspect-square w-full shrink-0 overflow-hidden bg-muted md:w-1/2 ${zoom ? "cursor-zoom-out" : "cursor-zoom-in"}`}
+              onClick={() => setZoom((z) => !z)}
+              onMouseMove={(e) => { const r = e.currentTarget.getBoundingClientRect(); setOrigin(`${((e.clientX - r.left) / r.width) * 100}% ${((e.clientY - r.top) / r.height) * 100}%`); }}
+            >
+              {view.image_url && <img src={view.image_url} alt={view.name} style={{ transformOrigin: origin }} className={`h-full w-full object-cover transition-transform duration-300 ${zoom ? "scale-[2.5]" : ""}`} />}
+              <span className="absolute bottom-2 left-2 rounded-full bg-background/80 px-2 py-0.5 text-xs">{zoom ? "Tap to zoom out" : "Tap to zoom"}</span>
+            </div>
+            <div className="flex flex-1 flex-col p-5">
+              <div className="flex items-start justify-between gap-2">
+                <h2 className="text-2xl font-semibold">{view.name}</h2>
+                <button onClick={() => setView(null)} aria-label="Close"><X /></button>
+              </div>
+              <p className="mt-2 text-xl font-bold text-primary">{formatPKR(Number(view.price))}</p>
+              {view.description && <p className="mt-3 whitespace-pre-line text-sm text-muted-foreground">{view.description}</p>}
+              <button disabled={!view.in_stock}
+                onClick={() => { cart.add({ id: view.id, name: view.name, price: Number(view.price), image_url: view.image_url }); toast.success("Added to cart"); setView(null); }}
+                className="mt-6 rounded-full bg-primary py-3 font-semibold text-primary-foreground disabled:opacity-40">
+                {view.in_stock ? "Add to cart" : "Sold out"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {open && (
         <div className="fixed inset-0 z-30 flex justify-end bg-foreground/40" onClick={() => setOpen(false)}>
