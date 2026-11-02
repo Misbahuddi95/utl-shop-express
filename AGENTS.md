@@ -10,4 +10,5 @@
 <!-- LOVABLE:END -->
 
 - Company password recovery uses a public `/reset-password` page and Cloud Auth recovery sessions, not company approval status; account recovery must remain available before and after approval.
-- Keep the requested homepage-only sitemap in `public/sitemap.xml`; omit lastmod unless an authoritative page-specific content timestamp exists.
+- Serve the homepage and public product URLs from the dynamic `/sitemap.xml` handler using paginated anonymous reads; omit lastmod unless an authoritative page-specific content timestamp exists. This keeps new products discoverable without rebuilding a static file.
+- Product pages load public product/category DTOs through a server function and reuse the storefront cart/checkout layout, so product SEO never needs privileged reads or divergent checkout behavior.
