@@ -11,6 +11,7 @@
 - [x] Checkout email field; order-complete status flow in admin
 
 ## Open
+- [ ] Product SEO pages: server-rendered details, crawlable homepage links, product metadata/structured data, dynamic public product sitemap, and cart/checkout verification; do not change admin, portal, or database security.
 - [ ] Company dashboard: own products, own order items and approval status, with ownership checks and signed-in verification.
 - [x] Company portal forgot-password and public secure reset page; tests passed, reset request accepted, invalid links blocked.
 - [ ] Complete company password recovery through the recipient's inbox link — blocked: recipient must open the email; delivery and password-change completion not verified.
