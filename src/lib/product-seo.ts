@@ -46,3 +46,11 @@ export function productSchema(product: PublicProduct) {
     },
   };
 }
+export function breadcrumbSchema(product: PublicProduct) {
+  const names = [["Home", `${STORE_ORIGIN}/`], ...(product.category_name ? [[product.category_name, `${STORE_ORIGIN}/`]] : []), [product.name, productUrl(product.id)]];
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: names.map(([name, item], i) => ({ "@type": "ListItem", position: i + 1, name, item })),
+  };
+}

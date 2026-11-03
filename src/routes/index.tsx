@@ -5,9 +5,11 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { formatPKR, useCart } from "@/lib/store";
 import { StoreLayout } from "@/components/store/store-layout";
+import { getShareImage } from "@/lib/products.functions";
 
 export const Route = createFileRoute("/")({
-  head: () => ({
+  loader: async () => ({ shareImage: await getShareImage() }),
+  head: ({ loaderData }) => ({
     meta: [
       { title: "UTL Online Store | Kids Fashion, Frocks, Hoodies & Dupatta in Pakistan" },
       { name: "description", content: "Shop kids fashion, girls frocks, boys t-shirts, hoodies and dupatta online at UTL Online Store. Easy ordering with delivery across Pakistan." },
@@ -16,6 +18,7 @@ export const Route = createFileRoute("/")({
       { property: "og:url", content: "https://utl-shop-express.lovable.app/" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      ...(loaderData?.shareImage ? [{ property: "og:image", content: loaderData.shareImage }, { name: "twitter:image", content: loaderData.shareImage }] : []),
     ],
     links: [{ rel: "canonical", href: "https://utl-shop-express.lovable.app/" }],
     scripts: [{
@@ -81,10 +84,10 @@ function Store() {
           <p className="rounded-xl border border-dashed p-10 text-center text-muted-foreground">No products yet.</p>
         ) : (
           <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-            {shown.map((p) => (
+            {shown.map((p, idx) => (
               <article key={p.id} className="flex flex-col overflow-hidden rounded-2xl border bg-card">
                 <Link to="/product/$id" params={{ id: p.id }} className="aspect-square overflow-hidden bg-muted" aria-label={`View ${p.name}`}>
-                  {p.image_url && <img src={p.image_url} alt={p.name} className="h-full w-full object-cover transition-transform duration-300 hover:scale-110" loading="lazy" />}
+                  {p.image_url && <img src={p.image_url} alt={p.name} width={400} height={400} className="h-full w-full object-cover transition-transform duration-300 hover:scale-110" loading={idx < 4 ? "eager" : "lazy"} />}
                 </Link>
                 <div className="flex flex-1 flex-col p-3">
                   <h3 className="font-sans text-sm font-semibold"><Link to="/product/$id" params={{ id: p.id }}>{p.name}</Link></h3>

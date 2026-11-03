@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { StoreLayout } from "@/components/store/store-layout";
 import { formatPKR, useCart } from "@/lib/store";
 import { productQueryOptions } from "@/lib/product-query";
-import { productDescription, productImageUrl, productSchema, productUrl } from "@/lib/product-seo";
+import { breadcrumbSchema, productDescription, productImageUrl, productSchema, productUrl } from "@/lib/product-seo";
 
 export const Route = createFileRoute("/product/$id")({
   loader: ({ context, params }) => context.queryClient.ensureQueryData(productQueryOptions(params.id)),
@@ -39,7 +39,10 @@ export const Route = createFileRoute("/product/$id")({
         ...(image ? [{ property: "og:image", content: image }, { name: "twitter:image", content: image }] : []),
       ],
       links: [{ rel: "canonical", href: url }],
-      scripts: [{ type: "application/ld+json", children: JSON.stringify(productSchema(loaderData)).replace(/</g, "\\u003c") }],
+      scripts: [
+        { type: "application/ld+json", children: JSON.stringify(productSchema(loaderData)).replace(/</g, "\\u003c") },
+        { type: "application/ld+json", children: JSON.stringify(breadcrumbSchema(loaderData)).replace(/</g, "\\u003c") },
+      ],
     };
   },
   component: ProductPage,
@@ -71,6 +74,10 @@ function ProductPage() {
   return (
     <StoreLayout cart={cart}>
       <main className="mx-auto max-w-6xl px-4 py-8">
+        <nav aria-label="Breadcrumb" className="mb-2 text-xs text-muted-foreground">
+          <Link to="/" className="hover:underline">Home</Link>
+          {product.category_name && <> / <span>{product.category_name}</span></>} / <span className="text-foreground">{product.name}</span>
+        </nav>
         <Button asChild variant="link" className="mb-6 px-0"><Link to="/"><ArrowLeft />Back to store</Link></Button>
         <div className="grid gap-6 md:grid-cols-2">
           <Button
@@ -84,7 +91,7 @@ function ProductPage() {
               setOrigin(`${((e.clientX - rect.left) / rect.width) * 100}% ${((e.clientY - rect.top) / rect.height) * 100}%`);
             }}
           >
-            {product.image_url && <img src={product.image_url} alt={product.name} style={{ transformOrigin: origin }} className={`h-full w-full object-cover transition-transform duration-300 motion-reduce:transition-none ${zoom ? "scale-[2.5]" : ""}`} />}
+            {product.image_url && <img src={product.image_url} alt={product.name} width={700} height={700} loading="eager" style={{ transformOrigin: origin }} className={`h-full w-full object-cover transition-transform duration-300 motion-reduce:transition-none ${zoom ? "scale-[2.5]" : ""}`} />}
           </Button>
           <div className="min-w-0 py-2">
             <p className="text-sm text-muted-foreground">{product.category_name ?? "Uncategorized"}</p>
