@@ -50,6 +50,13 @@
       "when": 1792295098399,
       "tag": "0006_company_order_dashboard",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1793701448218,
+      "tag": "0007_lock_store_settings",
+      "breakpoints": true
     }
   ]
 }
