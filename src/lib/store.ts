@@ -70,7 +70,7 @@ export function useStoreLogo() {
   const { data = "" } = useQuery({
     queryKey: ["store-logo"],
     queryFn: async () =>
-      (await supabase.from("store_settings").select("value").eq("key", "logo_url").maybeSingle()).data?.value ?? "",
+      ((await supabase.rpc("get_public_settings")).data ?? []).find((r) => r.key === "logo_url")?.value ?? "",
   });
   return data;
 }

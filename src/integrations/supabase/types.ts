@@ -227,6 +227,13 @@ export type Database = {
           total: number
         }[]
       }
+      get_public_settings: {
+        Args: never
+        Returns: {
+          key: string
+          value: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
