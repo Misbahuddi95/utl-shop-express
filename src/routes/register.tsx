@@ -28,7 +28,7 @@ function Register() {
   const { data: cfg } = useQuery({
     queryKey: ["vendor-cfg"],
     queryFn: async () => {
-      const { data } = await supabase.from("store_settings").select("key,value").in("key", ["vendor_fee", "vendor_payment_info", "vendor_bank_details", "vendor_mobile_details"]);
+      const { data } = await supabase.rpc("get_public_settings");
       return Object.fromEntries((data ?? []).map((r) => [r.key, r.value]));
     },
   });
