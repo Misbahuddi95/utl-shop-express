@@ -25,3 +25,18 @@ export const getPublicProduct = createServerFn({ method: "GET" })
       image_url: product.image_url, price: Number(product.price), in_stock: product.in_stock, category_name,
     };
   });
+/** Absolute https image for link previews: store logo, else newest product photo. */
+export const getShareImage = createServerFn({ method: "GET" }).handler(async (): Promise<string | null> => {
+  const { productImageUrl } = await import("./product-seo");
+  try {
+    const { createPublicStoreClient } = await import("./public-store.server");
+    const client = createPublicStoreClient();
+    const { data: settings } = await client.rpc("get_public_settings");
+    const logo = productImageUrl((settings ?? []).find((r) => r.key === "logo_url")?.value ?? null);
+    if (logo) return logo;
+    const { data: rows } = await client.from("products").select("image_url").not("image_url", "is", null)
+      .order("created_at", { ascending: false }).limit(10);
+    for (const r of rows ?? []) { const u = productImageUrl(r.image_url); if (u) return u; }
+  } catch { /* no preview image */ }
+  return null;
+});
