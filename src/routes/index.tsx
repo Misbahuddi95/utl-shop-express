@@ -68,6 +68,10 @@ function Store() {
           <p className="text-sm uppercase tracking-widest text-accent">Online Store</p>
           <h1 className="mt-2 max-w-xl text-4xl font-semibold leading-tight md:text-5xl">Kids Fashion & Everyday Essentials, Delivered Across Pakistan</h1>
           <p className="mt-3 max-w-md opacity-80">Choose items, add them to your cart, and place your order in a minute.</p>
+
+          <div className="mt-8 overflow-hidden rounded-2xl border border-primary-foreground/20">
+            <video src={heroVideo.url} autoPlay muted loop playsInline preload="metadata" aria-label="UTL Online Store products on display" className="block h-auto w-full object-cover" />
+          </div>
         </div>
       </section>
 
