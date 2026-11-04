@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { formatPKR, useCart } from "@/lib/store";
 import { StoreLayout } from "@/components/store/store-layout";
 import { getShareImage } from "@/lib/products.functions";
+import heroVideo from "@/assets/utl-store-hero.mp4.asset.json";
 
 export const Route = createFileRoute("/")({
   loader: async () => ({ shareImage: await getShareImage() }),
