@@ -9,6 +9,7 @@
 - [x] 16 UTL products + 4 women products (AI photos) — 24 total
 - [x] Orders CSV export, realtime order updates in admin
 - [x] Checkout email field; order-complete status flow in admin
+- [x] Homepage hero video (generated scenes) added to the storefront and verified playing
 
 ## Open
 - [ ] Product SEO pages: server-rendered details, crawlable homepage links, product metadata/structured data, dynamic public product sitemap, and cart/checkout verification; do not change admin, portal, or database security.
