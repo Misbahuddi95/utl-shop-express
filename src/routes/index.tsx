@@ -7,6 +7,7 @@ import { formatPKR, useCart } from "@/lib/store";
 import { StoreLayout } from "@/components/store/store-layout";
 import { getShareImage } from "@/lib/products.functions";
 import heroVideo from "@/assets/utl-store-hero.mp4.asset.json";
+import bannerImg from "@/assets/utl-banner.jpg";
 
 export const Route = createFileRoute("/")({
   loader: async () => ({ shareImage: await getShareImage() }),
@@ -74,6 +75,17 @@ function Store() {
           </div>
         </div>
       </section>
+
+      <div className="mx-auto max-w-6xl px-4 pt-8">
+        <div className="relative overflow-hidden rounded-2xl bg-primary text-primary-foreground">
+          <img src={bannerImg} alt="UTL kids fashion, dupatta and essentials" width={1600} height={640} loading="lazy" className="block h-auto w-full" />
+          <div className="absolute inset-y-0 left-0 flex w-1/2 flex-col justify-center gap-2 p-4 md:p-10">
+            <p className="text-xs uppercase tracking-widest text-accent md:text-sm">New Collection</p>
+            <p className="text-xl font-semibold leading-tight md:text-4xl">Kids Fashion & Dupatta</p>
+            <p className="hidden text-sm opacity-80 md:block">Delivery across Pakistan · Cash on delivery</p>
+          </div>
+        </div>
+      </div>
 
       <main className="mx-auto max-w-6xl px-4 py-8">
         <div className="-mx-4 mb-6 flex gap-2 overflow-x-auto px-4 pb-1">
