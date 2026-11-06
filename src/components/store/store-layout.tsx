@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useState, type ReactNode } from "react";
-import { ShoppingBag, X, Minus, Plus } from "lucide-react";
+import { ShoppingBag, X, Minus, Plus, CreditCard } from "lucide-react";
+import { createCardCheckout } from "@/lib/shopify";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { cartTotal, formatPKR, useCart, useStoreLogo } from "@/lib/store";
@@ -11,6 +12,28 @@ export function StoreLayout({ cart, children }: { cart: ReturnType<typeof useCar
   const [step, setStep] = useState<"cart" | "checkout" | "done">("cart");
   const [sending, setSending] = useState(false);
   const count = cart.items.reduce((s, i) => s + i.qty, 0);
+
+  const [paying, setPaying] = useState(false);
+  async function payByCard() {
+    // Open the tab synchronously so mobile browsers don't block it, then point it at Shopify checkout.
+    const tab = window.open("", "_blank");
+    setPaying(true);
+    try {
+      const r = await createCardCheckout(cart.items);
+      if ("missing" in r) {
+        tab?.close();
+        toast.error(`Card payment isn't available yet for: ${r.missing.join(", ")}. Please use cash on delivery.`);
+        return;
+      }
+      if (tab) tab.location.href = r.url;
+      else window.open(r.url, "_blank");
+    } catch (err) {
+      tab?.close();
+      toast.error(err instanceof Error ? err.message : "Card payment could not start.");
+    } finally {
+      setPaying(false);
+    }
+  }
 
   async function placeOrder(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -98,7 +121,10 @@ export function StoreLayout({ cart, children }: { cart: ReturnType<typeof useCar
                 </div>
                 <div className="border-t p-4">
                   <div className="mb-3 flex justify-between font-semibold"><span>Total</span><span>{formatPKR(cartTotal(cart.items))}</span></div>
-                  <button disabled={!cart.items.length} onClick={() => setStep("checkout")} className="w-full rounded-full bg-primary py-3 font-semibold text-primary-foreground disabled:opacity-40">Checkout</button>
+                  <button disabled={!cart.items.length} onClick={() => setStep("checkout")} className="w-full rounded-full bg-primary py-3 font-semibold text-primary-foreground disabled:opacity-40">Cash on delivery</button>
+                  <button disabled={!cart.items.length || paying} onClick={payByCard} className="mt-2 flex w-full items-center justify-center gap-2 rounded-full border-2 border-primary py-3 font-semibold text-primary disabled:opacity-40">
+                    <CreditCard className="h-4 w-4" />{paying ? "Opening secure payment…" : "Pay by credit / debit card"}
+                  </button>
                 </div>
               </>
             )}
